@@ -81,15 +81,16 @@ jobs:
         run: |
           message="Create Terraform Storage Account if not exists"
           echo "$message"
-          cmd="az group create -l ${{ github.event.inputs.AZURE_REGION }} -n ${{ env.TERRAFORM_RESOURCE_GROUP }}"
-          echo "$cmd"
-          eval "$cmd"
-          az storage account create -n ${{ env.TERRAFORM_STORAGE_ACCOUNT }} -g ${{ env.TERRAFORM_RESOURCE_GROUP }} -l ${{ github.event.inputs.AZURE_REGION }} --sku Standard_GRS --kind StorageV2 --allow-blob-public-access false
-          az storage container create -n "tfstate" --account-name ${{ env.TERRAFORM_STORAGE_ACCOUNT }} --auth-mode login
-          az storage account update --name ${{ env.TERRAFORM_STORAGE_ACCOUNT }} --resource-group ${{ env.TERRAFORM_RESOURCE_GROUP }} --min-tls-version TLS1_2 # enforce TLS 1.2
-          az security atp storage update --resource-group ${{ env.TERRAFORM_RESOURCE_GROUP }} --storage-account ${{ env.TERRAFORM_STORAGE_ACCOUNT }} --is-enabled true # enable ATP
-          az storage account update --default-action Deny --name ${{ env.TERRAFORM_STORAGE_ACCOUNT }} --resource-group ${{ env.TERRAFORM_RESOURCE_GROUP }}          
-          
+          if [ $(az group exists --name ${{ env.TERRAFORM_RESOURCE_GROUP }}) = false ]; then
+              az group create -l ${{ github.event.inputs.AZURE_REGION }} -n ${{ env.TERRAFORM_RESOURCE_GROUP }}
+          fi
+          if [ $(az storage account check-name --name sto5gcloudpoc --query nameAvailable) = true ]; then
+            az storage account create -n ${{ env.TERRAFORM_STORAGE_ACCOUNT }} -g ${{ env.TERRAFORM_RESOURCE_GROUP }} -l ${{ github.event.inputs.AZURE_REGION }} --sku Standard_GRS --kind StorageV2 --allow-blob-public-access false
+            az storage container create -n "tfstate" --account-name ${{ env.TERRAFORM_STORAGE_ACCOUNT }} --auth-mode login
+            az storage account update --name ${{ env.TERRAFORM_STORAGE_ACCOUNT }} --resource-group ${{ env.TERRAFORM_RESOURCE_GROUP }} --min-tls-version TLS1_2 # enforce TLS 1.2
+            az security atp storage update --resource-group ${{ env.TERRAFORM_RESOURCE_GROUP }} --storage-account ${{ env.TERRAFORM_STORAGE_ACCOUNT }} --is-enabled true # enable ATP
+            az storage account update --default-action Deny --name ${{ env.TERRAFORM_STORAGE_ACCOUNT }} --resource-group ${{ env.TERRAFORM_RESOURCE_GROUP }}          
+          fi
   deployinfrastructure:
     name: 'stage deploy infrastructure with terraform'
     runs-on: ubuntu-20.04
