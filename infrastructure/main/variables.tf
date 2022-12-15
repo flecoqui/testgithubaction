@@ -22,6 +22,16 @@ variable "terraform_storage_key" {
   default     = "cotf5gpoc.tfstate"
 }
 
+variable "subscriptionId" {
+  type        = string
+  description = "(Required) The Azure Subscription Id."
+}
+
+variable "tenantId" {
+  type        = string
+  description = "(Required) The Azure Active Directory Tenant Id."
+}
+
 variable "resource_group_name" {
   type        = string
   description = "(Required) The name of the resource group in which to create the PostgreSQL Server. Changing this forces a new resource to be created."
