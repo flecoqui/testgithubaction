@@ -1,14 +1,3 @@
-provider "azurerm" {
-  subscription_id = var.subscriptionId
-  tenant_id       = var.tenantId
-  features {
-  }
-}
-
-terraform {
-  backend "azurerm" {}
-}
-
 locals {
   deploy_resource_group_name = format("%s/%s", var.resource_group_name, var.environment)
 }
