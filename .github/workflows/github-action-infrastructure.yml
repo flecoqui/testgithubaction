@@ -93,7 +93,7 @@ jobs:
           fi
   deployinfrastructure:
     name: 'stage-deploy-infrastructure-with-terraform'
-    needs: stage-deploy-terraform-storage
+    needs: deployterraformstorage
     runs-on: ubuntu-20.04
     steps:
       - name: 'Checkout'
