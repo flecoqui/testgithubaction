@@ -180,6 +180,7 @@ jobs:
           tf_actions_version: 1.3.6
           tf_actions_subcommand: 'validate'
           tf_actions_working_dir: "./infrastructure/main"
+          args: '  -backend-config="resource_group_name=${{ env.TERRAFORM_RESOURCE_GROUP }}" -backend-config="storage_account_name=${{ env.TERRAFORM_STORAGE_ACCOUNT }}"  -backend-config="container_name=${{ env.TERRAFORM_STORAGE_CONTAINER }}" -backend-config="key=${{ env.TERRAFORM_STORAGE_KEY }}"'
           
       - name: 'Terraform Plan'
         uses: hashicorp/terraform-github-actions@master
@@ -187,7 +188,7 @@ jobs:
           tf_actions_version: 1.3.6
           tf_actions_subcommand: 'plan'
           tf_actions_working_dir: "./infrastructure/main"
-          args: '-var="subscriptionId=$AZURE_SUBSCRIPTION_ID" -var="tenantId=$AZURE_TENANT_ID" -var="environment=${{ env.TERRAFORM_STORAGE_CONTAINER }}"'
+          args: '  -backend-config="resource_group_name=${{ env.TERRAFORM_RESOURCE_GROUP }}" -backend-config="storage_account_name=${{ env.TERRAFORM_STORAGE_ACCOUNT }}"  -backend-config="container_name=${{ env.TERRAFORM_STORAGE_CONTAINER }}" -backend-config="key=${{ env.TERRAFORM_STORAGE_KEY }}"'
   
       - name: Terraform Apply
         if: github.ref == 'refs/heads/main'
@@ -196,7 +197,7 @@ jobs:
           tf_actions_version: 1.3.6
           tf_actions_subcommand: 'apply'
           tf_actions_working_dir: "./infrastructure/main"
-          args: '-var="subscriptionId=$AZURE_SUBSCRIPTION_ID" -var="tenantId=$AZURE_TENANT_ID" -var="environment=${{ env.TERRAFORM_STORAGE_CONTAINER }}"'
+          args: '  -backend-config="resource_group_name=${{ env.TERRAFORM_RESOURCE_GROUP }}" -backend-config="storage_account_name=${{ env.TERRAFORM_STORAGE_ACCOUNT }}"  -backend-config="container_name=${{ env.TERRAFORM_STORAGE_CONTAINER }}" -backend-config="key=${{ env.TERRAFORM_STORAGE_KEY }}"'
           
       - name: Close Terraform Storage firewall
         continue-on-error: false        
