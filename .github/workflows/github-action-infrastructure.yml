@@ -42,14 +42,14 @@ on:
 
 env:
   ENVIRONMENT: "${{ github.event.inputs.ENVIRONMENT }}"
-  TERRAFORM_STORAGE_ACCOUNT: "sto${{ github.event.inputs.AZURE_APP_PREFIX }}"
-  TERRAFORM_STORAGE_CONTAINER: "con${{ github.event.inputs.AZURE_APP_PREFIX }}"
-  TERRAFORM_STORAGE_KEY: "con${{ github.event.inputs.AZURE_APP_PREFIX }}.tfstate"
-  TERRAFORM_RESOURCE_GROUP: "rg${{ github.event.inputs.AZURE_APP_PREFIX }}${{ github.event.inputs.ENVIRONMENT }}" 
+  TERRAFORM_STORAGE_ACCOUNT: "stotf${{ github.event.inputs.AZURE_APP_PREFIX }}"
+  TERRAFORM_STORAGE_CONTAINER: "contf${{ github.event.inputs.AZURE_APP_PREFIX }}"
+  TERRAFORM_STORAGE_KEY: "contf${{ github.event.inputs.AZURE_APP_PREFIX }}.tfstate"
+  TERRAFORM_RESOURCE_GROUP: "rgtf${{ github.event.inputs.AZURE_APP_PREFIX }}${{ github.event.inputs.ENVIRONMENT }}" 
   ARM_CLIENT_ID: ${{ secrets.AZURE_AD_CLIENT_ID }}
   ARM_CLIENT_SECRET: ${{ secrets.AZURE_AD_CLIENT_SECRET }}
   ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-  ARM_TENANT_ID: ${{ secrets.AZURE_AD_TENANT_ID }}
+  ARM_TENANT_ID: ${{ secrets.AZUR E_AD_TENANT_ID }}
 
 jobs:
   deployterraformstorage:
