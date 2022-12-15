@@ -190,7 +190,6 @@ jobs:
           args: '-var="subscriptionId=$AZURE_SUBSCRIPTION_ID" -var="tenantId=$AZURE_TENANT_ID" -var="environment=${{ env.ENVIRONMENT }}"'
 
       - name: Terraform Apply
-        if: github.ref == 'refs/heads/main'
         uses: hashicorp/terraform-github-actions@master
         with:
           tf_actions_version: 1.3.6
