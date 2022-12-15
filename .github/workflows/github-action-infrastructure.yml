@@ -150,7 +150,7 @@ jobs:
               STORAGE_ACCOUNT_KEY=$(az storage account keys list  --account-name ${{ env.TERRAFORM_STORAGE_ACCOUNT }} --query "[0].value" --output tsv) 
               echo "Open '${{ env.TERRAFORM_STORAGE_ACCOUNT }}' Azure Storage firewall"
               az storage account update --resource-group "${{ env.TERRAFORM_RESOURCE_GROUP }}" --name "${{ env.TERRAFORM_STORAGE_ACCOUNT }}" --default-action Allow --output none
-              while [[ -z $(az storage container list --account-key  "$STORAGE_ACCOUNT_KEY" --account-name "$TF_VAR_STORAGE_ACCOUNT_NAME"  2>/dev/null| jq -r '. | length ' ) ]]; do                       
+              while [[ -z $(az storage container list --account-key  "$STORAGE_ACCOUNT_KEY" --account-name "${{ env.TERRAFORM_STORAGE_ACCOUNT }}"  2>/dev/null| jq -r '. | length ' ) ]]; do                       
                 echo 'Firewall is still blocking the access, waiting...'
                 sleep 10
               done
