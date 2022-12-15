@@ -85,9 +85,11 @@ jobs:
           message="Create Terraform Storage Account if not exists"
           echo "$message"
           if [ $(az group exists --name ${{ env.TERRAFORM_RESOURCE_GROUP }}) = false ]; then
+              echo "Create resource group  ${{ env.TERRAFORM_RESOURCE_GROUP }}"
               az group create -l ${{ github.event.inputs.AZURE_REGION }} -n ${{ env.TERRAFORM_RESOURCE_GROUP }}
           fi
           if [ $(az storage account check-name --name ${{ env.TERRAFORM_STORAGE_ACCOUNT }} --query nameAvailable) = true ]; then
+            echo "Create resource group  ${{ env.TERRAFORM_STORAGE_ACCOUNT }}"
             az storage account create -n ${{ env.TERRAFORM_STORAGE_ACCOUNT }} -g ${{ env.TERRAFORM_RESOURCE_GROUP }} -l ${{ github.event.inputs.AZURE_REGION }} --sku Standard_GRS --kind StorageV2 --allow-blob-public-access false
             az storage container create -n ${{ env.TERRAFORM_STORAGE_CONTAINER }}  --account-name ${{ env.TERRAFORM_STORAGE_ACCOUNT }} --auth-mode login
             # az storage account update --name ${{ env.TERRAFORM_STORAGE_ACCOUNT }} --resource-group ${{ env.TERRAFORM_RESOURCE_GROUP }} --min-tls-version TLS1_2 # enforce TLS 1.2
@@ -153,6 +155,8 @@ jobs:
                 sleep 10
               done
               sleep 30
+            else
+              echo "Azure Storage '${{ env.TERRAFORM_STORAGE_ACCOUNT }}' doesn't exist"
             fi
           fi 
 
