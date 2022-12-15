@@ -5,5 +5,6 @@ terraform {
       source  = "hashicorp/azurerm"
       version = "~> 3.35.0"
     }
+    features {}
   }
 }
