@@ -90,8 +90,8 @@ jobs:
           if [ $(az storage account check-name --name ${{ env.TERRAFORM_STORAGE_ACCOUNT }} --query nameAvailable) = true ]; then
             az storage account create -n ${{ env.TERRAFORM_STORAGE_ACCOUNT }} -g ${{ env.TERRAFORM_RESOURCE_GROUP }} -l ${{ github.event.inputs.AZURE_REGION }} --sku Standard_GRS --kind StorageV2 --allow-blob-public-access false
             az storage container create -n ${{ env.TERRAFORM_STORAGE_CONTAINER }}  --account-name ${{ env.TERRAFORM_STORAGE_ACCOUNT }} --auth-mode login
-            az storage account update --name ${{ env.TERRAFORM_STORAGE_ACCOUNT }} --resource-group ${{ env.TERRAFORM_RESOURCE_GROUP }} --min-tls-version TLS1_2 # enforce TLS 1.2
-            az security atp storage update --resource-group ${{ env.TERRAFORM_RESOURCE_GROUP }} --storage-account ${{ env.TERRAFORM_STORAGE_ACCOUNT }} --is-enabled true # enable ATP
+            # az storage account update --name ${{ env.TERRAFORM_STORAGE_ACCOUNT }} --resource-group ${{ env.TERRAFORM_RESOURCE_GROUP }} --min-tls-version TLS1_2 # enforce TLS 1.2
+            # az security atp storage update --resource-group ${{ env.TERRAFORM_RESOURCE_GROUP }} --storage-account ${{ env.TERRAFORM_STORAGE_ACCOUNT }} --is-enabled true # enable ATP
             az storage account update --default-action Deny --name ${{ env.TERRAFORM_STORAGE_ACCOUNT }} --resource-group ${{ env.TERRAFORM_RESOURCE_GROUP }}          
           fi
   deployinfrastructure:
@@ -143,10 +143,10 @@ jobs:
           echo "TERRAFORM_STORAGE_KEY=${{ env.TERRAFORM_STORAGE_KEY }}" 
           echo "TERRAFORM_RESOURCE_GROUP=${{ env.TERRAFORM_RESOURCE_GROUP }}" 
           if [[ -n ${{ env.TERRAFORM_STORAGE_ACCOUNT }} ]]; then
-            echo "##[command]Check if '${{ env.TERRAFORM_STORAGE_ACCOUNT }}' Azure Storage exists"
+            echo "Check if '${{ env.TERRAFORM_STORAGE_ACCOUNT }}' Azure Storage exists"
             if [[ -n $(az storage account show --name ${{ env.TERRAFORM_STORAGE_ACCOUNT }} 2>/dev/null| jq -r .id) ]]; then
               STORAGE_ACCOUNT_KEY=$(az storage account keys list  --account-name ${{ env.TERRAFORM_STORAGE_ACCOUNT }} --query "[0].value" --output tsv) 
-              echo "##[command]Open '${{ env.TERRAFORM_STORAGE_ACCOUNT }}' Azure Storage firewall"
+              echo "Open '${{ env.TERRAFORM_STORAGE_ACCOUNT }}' Azure Storage firewall"
               az storage account update --resource-group "${{ env.TERRAFORM_RESOURCE_GROUP }}" --name "${{ env.TERRAFORM_STORAGE_ACCOUNT }}" --default-action Allow --output none
               while [[ -z $(az storage container list --account-key  "$STORAGE_ACCOUNT_KEY" --account-name "$TF_VAR_STORAGE_ACCOUNT_NAME"  2>/dev/null| jq -r '. | length ' ) ]]; do                       
                 echo 'Firewall is still blocking the access, waiting...'
