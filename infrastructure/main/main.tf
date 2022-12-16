@@ -5,6 +5,11 @@ locals {
   acr_sku_name      = "Standard"
   acr_admin_enabled = false
 
+  akv_network_acls_bypass = "None"
+  akv_vm_deployment       = false
+  akv_disk_encryption     = false
+  akv_template_deployment = false
+
   akv_principals_read_write        = []
   akv_key_permissions_full         = ["Backup", "Create", "Decrypt", "Delete", "Encrypt", "Get", "Import", "List", "Purge", "Recover", "Restore", "Sign", "UnwrapKey", "Update", "Verify", "WrapKey"]
   akv_secret_permissions_full      = ["Backup", "Delete", "Get", "List", "Purge", "Recover", "Restore", "Set"]
