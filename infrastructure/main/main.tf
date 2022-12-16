@@ -23,7 +23,7 @@ resource "azurerm_resource_group" "rg" {
 module "acr" {
   source = "../acr/module"
 
-  name                  = join("", [var.acr_name_prefix, random_string.unique.result])
+  name                  = join("", [var.prefix, random_string.unique.result])
   create_resource_group = false
   resource_group_name   = azurerm_resource_group.rg.name
   location              = azurerm_resource_group.rg.location
