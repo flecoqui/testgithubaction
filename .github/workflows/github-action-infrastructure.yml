@@ -147,7 +147,7 @@ jobs:
           echo "TERRAFORM_RESOURCE_GROUP=${{ env.TERRAFORM_RESOURCE_GROUP }}"  
           if [[ -n ${{ env.TERRAFORM_STORAGE_ACCOUNT }} ]]; then
             echo "Check if '${{ env.TERRAFORM_STORAGE_ACCOUNT }}' Azure Storage exists"  
-            if [[ -n $(az storage account show --name ${{ env.TERRAFORM_STORAGE_ACCOUNT }} --resource-group "${{ env.TERRAFORM_RESOURCE_GROUP }}  2>/dev/null| jq -r .id) ]]; then
+            if [[ -n $(az storage account show --name ${{ env.TERRAFORM_STORAGE_ACCOUNT }} --resource-group "${{ env.TERRAFORM_RESOURCE_GROUP }}"  2>/dev/null| jq -r .id) ]]; then
               STORAGE_ACCOUNT_KEY=$(az storage account keys list  --account-name ${{ env.TERRAFORM_STORAGE_ACCOUNT }} --query "[0].value" --output tsv) 
               echo "Open '${{ env.TERRAFORM_STORAGE_ACCOUNT }}' Azure Storage firewall"  
               az storage account update --resource-group "${{ env.TERRAFORM_RESOURCE_GROUP }}" --name "${{ env.TERRAFORM_STORAGE_ACCOUNT }}" --default-action Allow --output none
@@ -215,7 +215,7 @@ jobs:
           echo "TERRAFORM_RESOURCE_GROUP=${{ env.TERRAFORM_RESOURCE_GROUP }}"  
           if [[ -n ${{ env.TERRAFORM_STORAGE_ACCOUNT }} ]]; then
             echo "Check if '${{ env.TERRAFORM_STORAGE_ACCOUNT }}' Azure Storage exists"  
-            if [[ -n $(az storage account show --name ${{ env.TERRAFORM_STORAGE_ACCOUNT }} --resource-group "${{ env.TERRAFORM_RESOURCE_GROUP }} 2>/dev/null| jq -r .id) ]]; then
+            if [[ -n $(az storage account show --name "${{ env.TERRAFORM_STORAGE_ACCOUNT }}" --resource-group "${{ env.TERRAFORM_RESOURCE_GROUP }}" 2>/dev/null| jq -r .id) ]]; then
               echo "Close '${{ env.TERRAFORM_STORAGE_ACCOUNT }}' Azure Storage firewall"  
               az storage account update --resource-group "${{ env.TERRAFORM_RESOURCE_GROUP }}" --name "${{ env.TERRAFORM_STORAGE_ACCOUNT }}" --default-action Deny  --output none
               sleep 30
