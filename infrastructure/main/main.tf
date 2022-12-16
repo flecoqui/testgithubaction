@@ -1,7 +1,7 @@
 locals {
   deploy_resource_group_name = format("%s%s", var.resource_group_name, var.environment)
-  acr_sku_name = "Standard"
-  acr_admin_enabled = false
+  acr_sku_name               = "Standard"
+  acr_admin_enabled          = false
 }
 
 data "azurerm_client_config" "current" {}
@@ -18,7 +18,7 @@ resource "azurerm_resource_group" "rg" {
   name     = local.deploy_resource_group_name
   location = var.location
 }
- 
+
 
 module "acr" {
   source = "../acr/module"
