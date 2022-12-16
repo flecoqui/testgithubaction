@@ -31,7 +31,7 @@ on:
         - 'eastus2'
         - 'westeurope'
       AZURE_DEPLOYMENT_TYPE:
-        description: 'Demonstration type: cloud or edge'
+        description: 'Deployment type: cloud or edge'
         required: true
         type: choice        
         default: 'cloud'
@@ -88,12 +88,14 @@ jobs:
               az group create -l ${{ github.event.inputs.AZURE_REGION }} -n ${{ env.TERRAFORM_RESOURCE_GROUP }}
           fi
           if [ $(az storage account check-name --name ${{ env.TERRAFORM_STORAGE_ACCOUNT }} --query nameAvailable) = true ]; then
-            echo "Create resource group  ${{ env.TERRAFORM_STORAGE_ACCOUNT }}"
+            echo "Create Terraform Storage Account  ${{ env.TERRAFORM_STORAGE_ACCOUNT }}"
             az storage account create -n ${{ env.TERRAFORM_STORAGE_ACCOUNT }} -g ${{ env.TERRAFORM_RESOURCE_GROUP }} -l ${{ github.event.inputs.AZURE_REGION }} --sku Standard_GRS --kind StorageV2 --allow-blob-public-access false
             az storage container create -n ${{ env.TERRAFORM_STORAGE_CONTAINER }}  --account-name ${{ env.TERRAFORM_STORAGE_ACCOUNT }} --auth-mode login
             # az storage account update --name ${{ env.TERRAFORM_STORAGE_ACCOUNT }} --resource-group ${{ env.TERRAFORM_RESOURCE_GROUP }} --min-tls-version TLS1_2 # enforce TLS 1.2
             # az security atp storage update --resource-group ${{ env.TERRAFORM_RESOURCE_GROUP }} --storage-account ${{ env.TERRAFORM_STORAGE_ACCOUNT }} --is-enabled true # enable ATP
-            az storage account update --default-action Deny --name ${{ env.TERRAFORM_STORAGE_ACCOUNT }} --resource-group ${{ env.TERRAFORM_RESOURCE_GROUP }}          
+            az storage account update --default-action Deny --name ${{ env.TERRAFORM_STORAGE_ACCOUNT }} --resource-group ${{ env.TERRAFORM_RESOURCE_GROUP }}  
+            # Wait 30 seconds before the next step use the same storage
+            sleep 30
           fi
   deployinfrastructure:
     name: 'stage-deploy-infrastructure-with-terraform'
@@ -190,7 +192,7 @@ jobs:
           tf_actions_version: 1.3.6
           tf_actions_subcommand: 'plan'
           tf_actions_working_dir: "./infrastructure/main"
-          args: ' -var="deployment_type=${{ github.event.inputs.AZURE_DEPLOYMENT_TYPE }}" -var="prefix=${{ github.event.inputs.AZURE_APP_PREFIX }}" -var="location=${{ github.event.inputs.AZURE_REGION }}" -var="environment=${{ github.event.inputs.ENVIRONMENT }}" -var="resource_group_name=rg${{ github.event.inputs.AZURE_APP_PREFIX }}"'
+          args: ' -var="deployment_type=${{ github.event.inputs.AZURE_DEPLOYMENT_TYPE }}" -var="prefix=${{ github.event.inputs.AZURE_APP_PREFIX }}" -var="location=${{ github.event.inputs.AZURE_REGION }}" -var="environment=${{ github.event.inputs.ENVIRONMENT }}" '
 
       - name: Terraform Apply
         continue-on-error: false        
@@ -199,7 +201,7 @@ jobs:
           tf_actions_version: 1.3.6
           tf_actions_subcommand: 'apply'
           tf_actions_working_dir: "./infrastructure/main"
-          args: ' -var="prefix=${{ github.event.inputs.AZURE_APP_PREFIX }}" -var="location=${{ github.event.inputs.AZURE_REGION }}" -var="environment=${{ github.event.inputs.ENVIRONMENT }}" -var="resource_group_name=rg${{ github.event.inputs.AZURE_APP_PREFIX }}"'
+          args: ' -var="deployment_type=${{ github.event.inputs.AZURE_DEPLOYMENT_TYPE }}" -var="prefix=${{ github.event.inputs.AZURE_APP_PREFIX }}" -var="location=${{ github.event.inputs.AZURE_REGION }}" -var="environment=${{ github.event.inputs.ENVIRONMENT }}" '
           
       - name: Close Terraform Storage firewall
         if: always()       
