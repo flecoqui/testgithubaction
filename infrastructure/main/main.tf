@@ -27,8 +27,8 @@ module "acr" {
   create_resource_group = false
   resource_group_name   = azurerm_resource_group.rg.name
   location              = azurerm_resource_group.rg.location
-  admin_enabled         = var.admin_enabled
-  sku_name              = var.sku_name
+  admin_enabled         = local.acr_admin_enabled
+  sku_name              = local.acr_sku_name
 
   depends_on = [
     azurerm_resource_group.rg
