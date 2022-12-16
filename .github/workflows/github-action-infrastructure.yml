@@ -178,7 +178,7 @@ jobs:
           tf_actions_version: 1.3.6
           tf_actions_subcommand: 'plan'
           tf_actions_working_dir: "./infrastructure/main"
-          args: '-var="location=${{ github.event.inputs.AZURE_REGION }}" -var="environment=${{ github.event.inputs.ENVIRONMENT }}" -var="resource_group_name=rg${{ github.event.inputs.AZURE_APP_PREFIX }}"'
+          args: ' -var="prefix=${{ github.event.inputs.AZURE_APP_PREFIX }}" -var="location=${{ github.event.inputs.AZURE_REGION }}" -var="environment=${{ github.event.inputs.ENVIRONMENT }}" -var="resource_group_name=rg${{ github.event.inputs.AZURE_APP_PREFIX }}"'
 
       - name: Terraform Apply
         uses: hashicorp/terraform-github-actions@master
@@ -186,7 +186,7 @@ jobs:
           tf_actions_version: 1.3.6
           tf_actions_subcommand: 'apply'
           tf_actions_working_dir: "./infrastructure/main"
-          args: '-var="location=${{ github.event.inputs.AZURE_REGION }}" -var="environment=${{ github.event.inputs.ENVIRONMENT }}" -var="resource_group_name=rg${{ github.event.inputs.AZURE_APP_PREFIX }}"'
+          args: ' -var="prefix=${{ github.event.inputs.AZURE_APP_PREFIX }}" -var="location=${{ github.event.inputs.AZURE_REGION }}" -var="environment=${{ github.event.inputs.ENVIRONMENT }}" -var="resource_group_name=rg${{ github.event.inputs.AZURE_APP_PREFIX }}"'
           
       - name: Close Terraform Storage firewall
         continue-on-error: false        

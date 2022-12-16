@@ -39,3 +39,9 @@ variable "environment" {
   description = "(Required) environment variable : dev, test, prod."
   default     = "dev"
 }
+
+variable "prefix" {
+  type        = string
+  description = "(Required) deployment prefix"
+  default     = "5gpoc"
+}
