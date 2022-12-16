@@ -1,7 +1,8 @@
 locals {
-  deploy_resource_group_name = format("%s%s", var.resource_group_name, var.environment)
+  deploy_resource_group_name = format("rg%s%s%s", var.prefix, var.deployment_type, var.environment)
   acr_sku_name               = "Standard"
   acr_admin_enabled          = false
+  tags                       = { "environment" : var.deployment_type, "deployment" : var.deployment_type }
 }
 
 data "azurerm_client_config" "current" {}
@@ -29,6 +30,7 @@ module "acr" {
   location              = azurerm_resource_group.rg.location
   admin_enabled         = local.acr_admin_enabled
   sku_name              = local.acr_sku_name
+  tags                  = local.tags
 
   depends_on = [
     azurerm_resource_group.rg

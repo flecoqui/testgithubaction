@@ -26,21 +26,29 @@ on:
         description: 'Azure Region for the deployment'
         required: true
         type: choice        
-        default: 'eastus2'
+        default: 'westeurope'
         options:
         - 'eastus2'
         - 'westeurope'
+      AZURE_DEPLOYMENT_TYPE:
+        description: 'Demonstration type: cloud or edge'
+        required: true
+        type: choice        
+        default: 'cloud'
+        options:
+        - 'cloud'
+        - 'edge'
       AZURE_APP_PREFIX:
         description: 'Application prefix used for naming'
         required: true
-        default: "5gcloudpoc"
+        default: "5gpoc"
 
 env:
   ENVIRONMENT: "${{ github.event.inputs.ENVIRONMENT }}"
-  TERRAFORM_STORAGE_ACCOUNT: "stotf${{ github.event.inputs.AZURE_APP_PREFIX }}"
-  TERRAFORM_STORAGE_CONTAINER: "contf${{ github.event.inputs.AZURE_APP_PREFIX }}"
-  TERRAFORM_STORAGE_KEY: "contf${{ github.event.inputs.AZURE_APP_PREFIX }}.tfstate"
-  TERRAFORM_RESOURCE_GROUP: "rgtf${{ github.event.inputs.AZURE_APP_PREFIX }}${{ github.event.inputs.ENVIRONMENT }}" 
+  TERRAFORM_STORAGE_ACCOUNT: "stotf${{ github.event.inputs.AZURE_APP_PREFIX }}${{ github.event.inputs.AZURE_DEPLOYMENT_TYPE }}${{ github.event.inputs.ENVIRONMENT }}"
+  TERRAFORM_STORAGE_CONTAINER: "contf${{ github.event.inputs.AZURE_APP_PREFIX }}${{ github.event.inputs.AZURE_DEPLOYMENT_TYPE }}${{ github.event.inputs.ENVIRONMENT }}"
+  TERRAFORM_STORAGE_KEY: "contf${{ github.event.inputs.AZURE_APP_PREFIX }}${{ github.event.inputs.AZURE_DEPLOYMENT_TYPE }}${{ github.event.inputs.ENVIRONMENT }}.tfstate"
+  TERRAFORM_RESOURCE_GROUP: "rgtf${{ github.event.inputs.AZURE_APP_PREFIX }}${{ github.event.inputs.AZURE_DEPLOYMENT_TYPE }}${{ github.event.inputs.ENVIRONMENT }}" 
 
 jobs:
   deployterraformstorage:
@@ -152,12 +160,14 @@ jobs:
           fi 
 
       - name: 'Terraform Format'
+        continue-on-error: false        
         uses: hashicorp/terraform-github-actions@master
         with:
           tf_actions_version: 1.3.6
           tf_actions_subcommand: 'fmt'
           tf_actions_working_dir: "./infrastructure/main"
       - name: 'Terraform Init'
+        continue-on-error: false        
         uses: hashicorp/terraform-github-actions@master
         with:
           tf_actions_version: 1.3.6
@@ -166,6 +176,7 @@ jobs:
           args: '  -backend-config="resource_group_name=${{ env.TERRAFORM_RESOURCE_GROUP }}" -backend-config="storage_account_name=${{ env.TERRAFORM_STORAGE_ACCOUNT }}"  -backend-config="container_name=${{ env.TERRAFORM_STORAGE_CONTAINER }}" -backend-config="key=${{ env.TERRAFORM_STORAGE_KEY }}"'
   
       - name: 'Terraform Validate'
+        continue-on-error: false        
         uses: hashicorp/terraform-github-actions@master
         with:
           tf_actions_version: 1.3.6
@@ -173,14 +184,16 @@ jobs:
           tf_actions_working_dir: "./infrastructure/main"
           
       - name: 'Terraform Plan'
+        continue-on-error: false        
         uses: hashicorp/terraform-github-actions@master
         with:
           tf_actions_version: 1.3.6
           tf_actions_subcommand: 'plan'
           tf_actions_working_dir: "./infrastructure/main"
-          args: ' -var="prefix=${{ github.event.inputs.AZURE_APP_PREFIX }}" -var="location=${{ github.event.inputs.AZURE_REGION }}" -var="environment=${{ github.event.inputs.ENVIRONMENT }}" -var="resource_group_name=rg${{ github.event.inputs.AZURE_APP_PREFIX }}"'
+          args: ' -var="deployment_type=${{ github.event.inputs.AZURE_DEPLOYMENT_TYPE }}" -var="prefix=${{ github.event.inputs.AZURE_APP_PREFIX }}" -var="location=${{ github.event.inputs.AZURE_REGION }}" -var="environment=${{ github.event.inputs.ENVIRONMENT }}" -var="resource_group_name=rg${{ github.event.inputs.AZURE_APP_PREFIX }}"'
 
       - name: Terraform Apply
+        continue-on-error: false        
         uses: hashicorp/terraform-github-actions@master
         with:
           tf_actions_version: 1.3.6
@@ -189,7 +202,8 @@ jobs:
           args: ' -var="prefix=${{ github.event.inputs.AZURE_APP_PREFIX }}" -var="location=${{ github.event.inputs.AZURE_REGION }}" -var="environment=${{ github.event.inputs.ENVIRONMENT }}" -var="resource_group_name=rg${{ github.event.inputs.AZURE_APP_PREFIX }}"'
           
       - name: Close Terraform Storage firewall
-        continue-on-error: false        
+        if: always()       
+        continue-on-error: false 
         run: |
           AZURE_SUBSCRIPTION_ID=$(az account show --query 'id' --output tsv)
           AZURE_TENANT_ID=$(az account show --query 'tenantId' --output tsv)
