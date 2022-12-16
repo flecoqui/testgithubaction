@@ -54,10 +54,10 @@ env:
 jobs:
   deployterraformstorage:
     name: 'stage-deploy-terraform-storage'
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
       - name: 'Checkout'
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Azure Login
         uses: azure/login@v1
@@ -99,7 +99,7 @@ jobs:
   deployinfrastructure:
     name: 'stage-deploy-infrastructure-with-terraform'
     needs: deployterraformstorage
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     env:
       ARM_CLIENT_ID: ${{ fromJSON(secrets.AZURE_CREDENTIALS).clientId }}
       ARM_CLIENT_SECRET: ${{ fromJSON(secrets.AZURE_CREDENTIALS).clientSecret }}
@@ -108,7 +108,7 @@ jobs:
 
     steps:
       - name: 'Checkout'
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Azure Login
         uses: azure/login@v1
