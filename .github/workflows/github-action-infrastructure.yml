@@ -13,13 +13,8 @@ on:
   #     - devops-pipelines/github-action/github-action-infrastructure.yml
   workflow_dispatch:
     inputs:
-      inputParam1:
-        description: 'Input Param 1 bool'
-        required: true
-        type: boolean
-        default: false
       ENVIRONMENT:
-        description: 'Environment (dev, test, staging, production, ...)'
+        description: 'Environment (dev, test, prod, ...)'
         required: true
         type: choice
         default: 'dev'
@@ -46,10 +41,6 @@ env:
   TERRAFORM_STORAGE_CONTAINER: "contf${{ github.event.inputs.AZURE_APP_PREFIX }}"
   TERRAFORM_STORAGE_KEY: "contf${{ github.event.inputs.AZURE_APP_PREFIX }}.tfstate"
   TERRAFORM_RESOURCE_GROUP: "rgtf${{ github.event.inputs.AZURE_APP_PREFIX }}${{ github.event.inputs.ENVIRONMENT }}" 
-  ARM_CLIENT_ID: ${{ secrets.AZURE_AD_CLIENT_ID }}
-  ARM_CLIENT_SECRET: ${{ secrets.AZURE_AD_CLIENT_SECRET }}
-  ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-  ARM_TENANT_ID: ${{ secrets.AZURE_AD_TENANT_ID }}
 
 jobs:
   deployterraformstorage:
@@ -121,18 +112,18 @@ jobs:
         run: |
           AZURE_SUBSCRIPTION_ID=$(az account show --query 'id' --output tsv)
           AZURE_TENANT_ID=$(az account show --query 'tenantId' --output tsv)
-          echo "AZURE_REGION=${{ github.event.inputs.AZURE_REGION }}" >> $GITHUB_OUTPUT
-          echo "AZURE_APP_PREFIX=${{ github.event.inputs.AZURE_APP_PREFIX }}" >> $GITHUB_OUTPUT
-          echo "AZURE_SUBSCRIPTION_ID=$AZURE_SUBSCRIPTION_ID" >> $GITHUB_OUTPUT
-          echo "AZURE_TENANT_ID=$AZURE_TENANT_ID" >> $GITHUB_OUTPUT
-          echo "TERRAFORM_STORAGE_ACCOUNT=${{ env.TERRAFORM_STORAGE_ACCOUNT }}" >> $GITHUB_OUTPUT
-          echo "TERRAFORM_STORAGE_CONTAINER=${{ env.TERRAFORM_STORAGE_CONTAINER }}" >> $GITHUB_OUTPUT
-          echo "TERRAFORM_STORAGE_KEY=${{ env.TERRAFORM_STORAGE_KEY }}" >> $GITHUB_OUTPUT
-          echo "TERRAFORM_RESOURCE_GROUP=${{ env.TERRAFORM_RESOURCE_GROUP }}" >> $GITHUB_OUTPUT
-          echo "ARM_CLIENT_ID=${{ env.ARM_CLIENT_ID }}" >> $GITHUB_OUTPUT
-          echo "ARM_CLIENT_SECRET=${{ env.ARM_CLIENT_SECRET }}" >> $GITHUB_OUTPUT
-          echo "ARM_SUBSCRIPTION_ID=${{ env.ARM_SUBSCRIPTION_ID }}" >> $GITHUB_OUTPUT
-          echo "ARM_TENANT_ID=${{ env.ARM_TENANT_ID }}" >> $GITHUB_OUTPUT
+          echo "AZURE_REGION=${{ github.event.inputs.AZURE_REGION }}"  
+          echo "AZURE_APP_PREFIX=${{ github.event.inputs.AZURE_APP_PREFIX }}"  
+          echo "AZURE_SUBSCRIPTION_ID=$AZURE_SUBSCRIPTION_ID"  
+          echo "AZURE_TENANT_ID=$AZURE_TENANT_ID"  
+          echo "TERRAFORM_STORAGE_ACCOUNT=${{ env.TERRAFORM_STORAGE_ACCOUNT }}"  
+          echo "TERRAFORM_STORAGE_CONTAINER=${{ env.TERRAFORM_STORAGE_CONTAINER }}"  
+          echo "TERRAFORM_STORAGE_KEY=${{ env.TERRAFORM_STORAGE_KEY }}"  
+          echo "TERRAFORM_RESOURCE_GROUP=${{ env.TERRAFORM_RESOURCE_GROUP }}"  
+          echo "ARM_CLIENT_ID=${{ env.ARM_CLIENT_ID }}"  
+          echo "ARM_CLIENT_SECRET=${{ env.ARM_CLIENT_SECRET }}"  
+          echo "ARM_SUBSCRIPTION_ID=${{ env.ARM_SUBSCRIPTION_ID }}"  
+          echo "ARM_TENANT_ID=${{ env.ARM_TENANT_ID }}"  
 
 
       - name: Open Terraform Storage firewall
@@ -187,7 +178,7 @@ jobs:
           tf_actions_version: 1.3.6
           tf_actions_subcommand: 'plan'
           tf_actions_working_dir: "./infrastructure/main"
-          args: '-var="subscriptionId=$AZURE_SUBSCRIPTION_ID" -var="tenantId=$AZURE_TENANT_ID" -var="environment=${{ env.ENVIRONMENT }}"'
+          args: '-var="location=${{ github.event.inputs.AZURE_REGION }}" -var="environment=${{ github.event.inputs.ENVIRONMENT }}" -var="resource_group_name=rg${{ github.event.inputs.AZURE_APP_PREFIX }}"'
 
       - name: Terraform Apply
         uses: hashicorp/terraform-github-actions@master
@@ -195,7 +186,7 @@ jobs:
           tf_actions_version: 1.3.6
           tf_actions_subcommand: 'apply'
           tf_actions_working_dir: "./infrastructure/main"
-          args: '-var="subscriptionId=$AZURE_SUBSCRIPTION_ID" -var="tenantId=$AZURE_TENANT_ID" -var="environment=${{ env.ENVIRONMENT }}"'
+          args: '-var="location=${{ github.event.inputs.AZURE_REGION }}" -var="environment=${{ github.event.inputs.ENVIRONMENT }}" -var="resource_group_name=rg${{ github.event.inputs.AZURE_APP_PREFIX }}"'
           
       - name: Close Terraform Storage firewall
         continue-on-error: false        
