@@ -94,10 +94,11 @@ jobs:
             # az storage account update --name ${{ env.TERRAFORM_STORAGE_ACCOUNT }} --resource-group ${{ env.TERRAFORM_RESOURCE_GROUP }} --min-tls-version TLS1_2 # enforce TLS 1.2
             # az security atp storage update --resource-group ${{ env.TERRAFORM_RESOURCE_GROUP }} --storage-account ${{ env.TERRAFORM_STORAGE_ACCOUNT }} --is-enabled true # enable ATP
             az storage account update --default-action Deny --name ${{ env.TERRAFORM_STORAGE_ACCOUNT }} --resource-group ${{ env.TERRAFORM_RESOURCE_GROUP }}  
-            # Wait 60 seconds before the next step use the same storage
-            sleep 60
+            echo "Wait 120 seconds before the next step"
+            # Wait 120 seconds before the next step use the same storage
+            sleep 120
             while [[ -z $(az storage account show --name ${{ env.TERRAFORM_STORAGE_ACCOUNT }} --resource-group "${{ env.TERRAFORM_RESOURCE_GROUP }}"  2>/dev/null| jq -r .id) ]]; do
-              echo 'Wait for the storage creation...'  
+              echo "Wait for the storage creation..."  
               sleep 10
             done
           fi
@@ -138,7 +139,6 @@ jobs:
           echo "ARM_CLIENT_SECRET=${{ env.ARM_CLIENT_SECRET }}"  
           echo "ARM_SUBSCRIPTION_ID=${{ env.ARM_SUBSCRIPTION_ID }}"  
           echo "ARM_TENANT_ID=${{ env.ARM_TENANT_ID }}"  
-
 
       - name: Open Terraform Storage firewall
         continue-on-error: false        
