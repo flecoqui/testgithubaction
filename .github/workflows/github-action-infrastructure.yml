@@ -201,7 +201,7 @@ jobs:
           args: ' -var="deployment_type=${{ github.event.inputs.AZURE_DEPLOYMENT_TYPE }}" -var="prefix=${{ github.event.inputs.AZURE_APP_PREFIX }}" -var="location=${{ github.event.inputs.AZURE_REGION }}" -var="environment=${{ github.event.inputs.ENVIRONMENT }}" '
 
       - name: Terraform Apply
-        if: github.ref == 'refs/heads/main'
+        if: github.ref == 'refs/heads/main' || "${{ github.event.inputs.ENVIRONMENT }}" == "test"
         continue-on-error: false        
         uses: hashicorp/terraform-github-actions@master
         with:
