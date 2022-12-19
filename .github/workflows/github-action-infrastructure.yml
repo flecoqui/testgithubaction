@@ -155,7 +155,7 @@ jobs:
               STORAGE_ACCOUNT_KEY=$(az storage account keys list  --account-name ${{ env.TERRAFORM_STORAGE_ACCOUNT }} --query "[0].value" --output tsv) 
               AGENT_IP_ADDRESS=$(curl ifconfig.me)
               echo "Open '${{ env.TERRAFORM_STORAGE_ACCOUNT }}' Azure Storage firewall Ip Address: ${AGENT_IP_ADDRESS}" 
-              az storage account network-rule add --ip-address ${AGENT_IP_ADDRESS} --resource-group "${{ env.TERRAFORM_RESOURCE_GROUP }}" --name "${{ env.TERRAFORM_STORAGE_ACCOUNT }}"   >/dev/null
+              az storage account network-rule add --ip-address ${AGENT_IP_ADDRESS} --resource-group "${{ env.TERRAFORM_RESOURCE_GROUP }}" --account-name "${{ env.TERRAFORM_STORAGE_ACCOUNT }}"   >/dev/null
               # az storage account update --resource-group "${{ env.TERRAFORM_RESOURCE_GROUP }}" --name "${{ env.TERRAFORM_STORAGE_ACCOUNT }}" --default-action Allow --output none
               while [[ -z $(az storage container list --account-key  "$STORAGE_ACCOUNT_KEY" --account-name "${{ env.TERRAFORM_STORAGE_ACCOUNT }}"  2>/dev/null| jq -r '. | length ' ) ]]; do                       
                 echo 'Firewall is still blocking the access, waiting...'  
@@ -225,7 +225,7 @@ jobs:
             if [[ -n $(az storage account show --name "${{ env.TERRAFORM_STORAGE_ACCOUNT }}" --resource-group "${{ env.TERRAFORM_RESOURCE_GROUP }}" 2>/dev/null| jq -r .id) ]]; then
               AGENT_IP_ADDRESS=$(curl ifconfig.me)
               echo "Close '${{ env.TERRAFORM_STORAGE_ACCOUNT }}' Azure Storage firewall Ip Address: ${AGENT_IP_ADDRESS}"  
-              az storage account network-rule remove --ip-address ${AGENT_IP_ADDRESS} --resource-group "${{ env.TERRAFORM_RESOURCE_GROUP }}" --name "${{ env.TERRAFORM_STORAGE_ACCOUNT }}"   >/dev/null
+              az storage account network-rule remove --ip-address ${AGENT_IP_ADDRESS} --resource-group "${{ env.TERRAFORM_RESOURCE_GROUP }}" --account-name "${{ env.TERRAFORM_STORAGE_ACCOUNT }}"   >/dev/null
               #az storage account update --resource-group "${{ env.TERRAFORM_RESOURCE_GROUP }}" --name "${{ env.TERRAFORM_STORAGE_ACCOUNT }}" --default-action Deny  --output none
               sleep 30
             fi
